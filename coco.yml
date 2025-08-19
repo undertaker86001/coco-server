@@ -349,6 +349,34 @@ connector:
     interval: 30m
     queue:
       name: indexing_documents
+    deployment_mode: cluster
+    read_strategy:
+      scroll_size: 1000
+      scroll_timeout: "5m"
+      slice_count: 4
+      preference: "_primary"
+    sync_policy:
+      full_sync_interval: "24h"
+      incremental_sync_interval: "5m"
+      fields: ["title", "content", "url", "@timestamp"]
+      query_filter: |
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-1d"
+            }
+          }
+        }
+    health_check:
+      enabled: true
+      interval: 30s
+      failure_threshold: 3
+      recovery_threshold: 2
+    retry_config:
+      max_retries: 3
+      initial_delay: "1s"
+      max_delay: "60s"
+      backoff_factor: 2.0
   network_drive:
     enabled: true
     interval: 30s
